@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Clone</title>
+    <style>
+        /* Your existing styles */
+        .game-container {
+            width: 350px;
+            height: 420px;
+            background: #121213;
+            border-radius: 5px;
+            padding: 20px;
+            position: relative;
+            margin: 0 auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-rows: repeat(6, 1fr);
+            gap: 5px;
+            height: 100%;
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 5px;
+        }
+
+        .cell {
+            background: #121213;
+            border: 2px solid #3a3a3c;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 32px;
+            font-weight: bold;
+            color: white;
+            text-transform: uppercase;
+        }
+
+        .cell.correct {
+            background: #538d4e;
+            border-color: #538d4e;
+        }
+
+        .cell.present {
+            background: #b59f3b;
+            border-color: #b59f3b;
+        }
+
+        .cell.absent {
+            background: #3a3a3c;
+            border-color: #3a3a3c;
+        }
+
+        .cell.filled {
+            animation: pop 0.1s;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .game-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        .game-overlay h2 {
+            font-size: 36px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-overlay .message {
+            font-size: 24px;
+            color: white;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .game-overlay .restart-button {
+            background: #538d4e;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        .game-overlay .restart-button:hover {
+            background: #4a7c45;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-overlay">
+            <h2>Game Over</h2>
+            <div class="message">The word was: <span class="target-word"></span></div>
+            <button class="restart-button">New Game</button>
+        </div>
+        <div class="grid"></div>
+    </div>
+
+    <script>
+        // Your existing game logic
+        const words = ['HELLO', 'WORLD', 'CLONE', 'GAMES', 'WORDS'];
+        let targetWord = words[Math.floor(Math.random() * words.length)];
+        let currentRow = 0;
+        let currentCol = 0;
+        let isGameOver = false;
+
+        // Initialize the grid
+        const grid = document.querySelector('.grid');
+        for (let i = 0; i < 6; i++) {
+            const row = document.createElement('div');
+            row.className = 'row';
+            for (let j = 0; j < 5; j++) {
+                const cell = document.createElement('div');
+                cell.className = 'cell';
+                row.appendChild(cell);
+            }
+            grid.appendChild(row);
+        }
+
+        function gameOver() {
+            isGameOver = true;
+            const overlay = document.querySelector('.game-overlay');
+            const targetWordSpan = overlay.querySelector('.target-word');
+            const message = overlay.querySelector('.message');
+            
+            overlay.style.display = 'flex';
+            targetWordSpan.textContent = targetWord;
+            
+            if (currentRow === 6) {
+                overlay.querySelector('h2').textContent = 'Game Over';
+                message.textContent = `The word was: ${targetWord}`;
+            } else {
+                overlay.querySelector('h2').textContent = 'You Win!';
+                message.textContent = `Congratulations! You guessed the word in ${currentRow} tries!`;
+            }
+        }
+
+        function startNewGame() {
+            // Reset game state
+            currentRow = 0;
+            currentCol = 0;
+            isGameOver = false;
+            targetWord = words[Math.floor(Math.random() * words.length)];
+            
+            // Clear the grid
+            const grid = document.querySelector('.grid');
+            grid.innerHTML = '';
+            
+            // Create new grid
+            for (let i = 0; i < 6; i++) {
+                const row = document.createElement('div');
+                row.className = 'row';
+                for (let j = 0; j < 5; j++) {
+                    const cell = document.createElement('div');
+                    cell.className = 'cell';
+                    row.appendChild(cell);
+                }
+                grid.appendChild(row);
+            }
+            
+            // Hide overlay
+            document.querySelector('.game-overlay').style.display = 'none';
+        }
+
+        // Add event listener for restart button
+        document.querySelector('.restart-button').addEventListener('click', startNewGame);
+
+        // Your existing keyboard event listeners and game logic
+        document.addEventListener('keydown', (e) => {
+            if (isGameOver) return;
+
+            if (e.key === 'Enter') {
+                if (currentCol === 5) {
+                    const row = document.querySelectorAll('.row')[currentRow];
+                    const cells = row.querySelectorAll('.cell');
+                    let guess = '';
+                    cells.forEach(cell => guess += cell.textContent);
+
+                    if (guess === targetWord) {
+                        cells.forEach((cell, i) => {
+                            cell.classList.add('correct');
+                        });
+                        gameOver();
+                    } else {
+                        const targetLetters = targetWord.split('');
+                        cells.forEach((cell, i) => {
+                            if (cell.textContent === targetLetters[i]) {
+                                cell.classList.add('correct');
+                            } else if (targetLetters.includes(cell.textContent)) {
+                                cell.classList.add('present');
+                            } else {
+                                cell.classList.add('absent');
+                            }
+                        });
+                        currentRow++;
+                        currentCol = 0;
+                        if (currentRow === 6) {
+                            gameOver();
+                        }
+                    }
+                }
+            } else if (e.key === 'Backspace') {
+                if (currentCol > 0) {
+                    currentCol--;
+                    const row = document.querySelectorAll('.row')[currentRow];
+                    const cell = row.querySelectorAll('.cell')[currentCol];
+                    cell.textContent = '';
+                }
+            } else if (/^[A-Za-z]$/.test(e.key)) {
+                if (currentCol < 5) {
+                    const row = document.querySelectorAll('.row')[currentRow];
+                    const cell = row.querySelectorAll('.cell')[currentCol];
+                    cell.textContent = e.key.toUpperCase();
+                    cell.classList.add('filled');
+                    currentCol++;
+                }
+            }
+        });
+    </script>
+</body>
+</html> 

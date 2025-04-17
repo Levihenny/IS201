@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flappy Pixel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      text-align: center;
+      font: arial;
+      font-family: sans-serif;
+      background: linear-gradient(to bottom, #87ceeb, #ffffff);
+      color: #333;
+    }
+    h1 {
+      margin: 20px 0;
+      font-size: 2.5rem;
+      color: #004466;
+    }
+    canvas {
+      display: block;
+      margin: 20px auto;
+      background: #cceeff;
+      border: 4px solid #004466;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    .menu {
+      margin-top: 20px;
+    }
+    .menu button {
+      margin: 10px;
+      padding: 12px 24px;
+      font-size: 1rem;
+      font-weight: bold;
+      color: #fff;
+      background-color: #004466;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .menu button:hover {
+      background-color: #006699;
+    }
+   
+    .top-bar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 12px 20px;
+    /* background: #8bcfeb; */
+    position: absolute;
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+    margin-bottom: 20px;
+    z-index: 10;
+  }
+
+  .menu-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    background: trans;
+    border-radius: 6px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s;
+  }
+
+  .menu-button:hover {
+    background: #65b1ca;
+  }
+
+  .hamburger-lines {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 16px;
+  }
+
+  .line {
+    width: 20px;
+    height: 3px;
+    border-radius: 1px;
+    background-color: #004466;
+    transition: background-color 0.3s;
+  }
+
+  .game-logo {
+    font-size: 36px;
+    color: #004466;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 20px;
+    background: #65b1ca;
+    padding: 5px;
+    border-radius: 6px;
+    z-index: 20;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: 8px 12px;
+    font-size: 24px;
+    text-decoration: none;
+    font-weight: bold;
+    color: #004466;
+    cursor: pointer;
+  }
+
+  .dropdown-link:hover {
+    background: #006699;
+    color: white;
+    border-radius: 5px;
+  }
+
+  .menu-button.menu-open,
+  .menu-button.menu-open:hover {
+    background: #65b1ca;
+  }
+
+  .menu-button.menu-open .line {
+    background-color: #004466;
+  }
+
+  .menu-button.menu-open .game-logo {
+    color: #004466;
+  }
+
+  .menu-button.menu-open .dropdown-menu {
+    display: block;
+  }
+  
+  canvas {
+  font-family: Arial, Helvetica, sans-serif;
+  image-rendering: optimizeSpeed;
+  image-rendering: pixelated;
+  }
+
+  .overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    text-align: center;
+    z-index: 100;
+  }
+
+  .winner-bird {
+    width: 60px;
+    height: 60px;
+    margin: 20px auto;
+    position: relative;
+    background: yellow;
+    border: 2px solid #004466;
+  }
+
+  .winner-bird.orange {
+    background: orange;
+  }
+
+  .winner-bird img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .crown {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 30px;
+    background: gold;
+    clip-path: polygon(0% 100%, 25% 0%, 50% 50%, 75% 0%, 100% 100%);
+  }
+
+  .game-over-content {
+    display: none;
+  }
+
+  .game-over-content.active {
+    display: block;
+  }
+
+  .overlay h2 {
+    color: #004466;
+    margin-bottom: 20px;
+    font-size: 2rem;
+  }
+
+  .final-score {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 20px 0;
+    padding: 10px 20px;
+    background: rgba(0, 68, 102, 0.1);
+    border-radius: 8px;
+    display: inline-block;
+  }
+
+  .overlay button {
+    margin: 10px;
+    padding: 12px 24px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #fff;
+    background-color: #004466;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 200px;
+  }
+
+  .overlay button:hover {
+    background-color: #006699;
+  }
+
+  .game-container {
+    position: relative;
+    width: 400px;
+    margin: 0 auto;
+  }
+
+  .game-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    width: 400px;
+    margin: 0 auto 20px;
+    gap: 10px;
+  }
+
+  .score-container {
+    background: #004466;
+    padding: 10px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 120px;
+    text-align: center;
+  }
+
+  .score-label {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    color: #ffffff;
+  }
+
+  .score-value {
+    font-size: 1.5rem;
+  }
+
+  .mode-button {
+    background: #004466;
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 6px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 120px;
+  }
+
+  .mode-button:hover {
+    background: #006699;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="menu-button" id="menu-toggle">
+      <div class="hamburger-lines">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+      <span class="game-logo">Flappy Pixel</span>
+      <div class="dropdown-menu" id="dropdown-menu">
+        <a href="../games.html" class="dropdown-link">Game Library</a>
+      </div>
+    </div>
+  </div>
+  <br> <br> <br> <br>
+  <div class="game-header">
+    <button class="mode-button" onclick="showModeSelect()">Select Gamemode</button>
+    <div class="score-container">
+      <div class="score-label">HIGH SCORE</div>
+      <div class="score-value" id="highScoreDisplay">0</div>
+    </div>
+  </div>
+  <div class="game-container">
+    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <div class="overlay" id="modeSelectOverlay">
+      <h2>Select Game Mode</h2>
+      <button onclick="selectMode('classic')">Single Player Classic</button>
+      <button onclick="selectMode('2player')">2 Player</button>
+      <button onclick="selectMode('cpu')">Player vs CPU</button>
+    </div>
+    <div class="overlay hidden" id="gameOverOverlay">
+      <div id="singleplayerOverlay" class="game-over-content">
+        <h2 id="gameOverMessage">Game Over</h2>
+        <div class="final-score" id="singleplayerScore">Score: 0</div>
+      </div>
+      <div id="twoplayerOverlay" class="game-over-content">
+        <h2 id="playerWinMessage">Player 1 Wins!</h2>
+        <div class="winner-bird" id="winnerBird">
+          <div class="crown"></div>
+        </div>
+        <div class="final-score" id="twoplayerScore">Score: 0</div>
+      </div>
+      <div id="cpuOverlay" class="game-over-content">
+        <h2 id="cpuResultMessage">You Win!</h2>
+        <div class="final-score" id="cpuScore">Score: 0</div>
+      </div>
+      <button onclick="restartGame()">Restart</button>
+    </div>
+  </div>
+
+
+  <audio id="bgMusic" loop src="assets/audio/8bit-theme.mp3"></audio>
+  <audio id="deathSound" src="../assets/audio/death.mp3"></audio>
+  <audio id="flapSound" src="../assets/audio/wingflap.mp3"></audio>
+
+  <script>
+    const menuToggle = document.getElementById('menu-toggle');
+
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('menu-open');
+    });
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const restartBtn = document.getElementById('restartBtn');
+    const mainMenu = document.getElementById('mainMenu');
+    const bgMusic = document.getElementById('bgMusic');
+    const deathSound = document.getElementById('deathSound');
+    const flapSound = document.getElementById('flapSound');
+
+    const birdImg = new Image();
+    birdImg.src = 'assets/img/bird-pixel.png';
+    let birdImgLoaded = false;
+    birdImg.onload = () => birdImgLoaded = true;
+
+    let bird, bird2, pipes, frame, score, highScore = 0, gameOver = false, gameStarted = false, mode = 'classic';
+    let playerWon = false;
+    let buttons = [];
+    let losingPlayer = null; // Track which player lost
+
+    function initGame() {
+      bird = {
+        x: 80,
+        y: 150,
+        width: 30,
+        height: 30,
+        gravity: 0.3,
+        lift: -7,
+        velocity: 0,
+        rotation: 0,
+        color: 'yellow'
+      };
+      bird2 = {
+        x: 120,
+        y: 150,
+        width: 30,
+        height: 30,
+        gravity: 0.3,
+        lift: -7,
+        velocity: 0,
+        rotation: 0,
+        color: 'orange'
+      };
+      pipes = [];
+      frame = 0;
+      score = 0;
+      gameOver = false;
+      losingPlayer = null;
+      updateHighScoreDisplay();
+    }
+
+    function drawBird(b) {
+      if (birdImgLoaded) {
+        ctx.save();
+        ctx.translate(b.x + b.width / 2, b.y + b.height / 2);
+        ctx.rotate(b.velocity / 10);
+        ctx.drawImage(birdImg, -b.width / 2, -b.height / 2, b.width, b.height);
+        ctx.restore();
+      } else {
+        ctx.fillStyle = b.color;
+        ctx.fillRect(b.x, b.y, b.width, b.height);
+      }
+    }
+
+    function drawPipe(pipe) {
+      ctx.fillStyle = '#228B22';
+      ctx.fillRect(pipe.x, 0, pipe.width, pipe.top);
+      ctx.fillRect(pipe.x, canvas.height - pipe.bottom, pipe.width, pipe.bottom);
+    }
+
+    function updateBird(b) {
+      b.velocity += b.gravity;
+      b.y += b.velocity;
+      if (b.y + b.height > canvas.height || b.y < 0) {
+        if (mode === '2player') {
+          if (b === bird) {
+            losingPlayer = 'player1';
+          } else {
+            losingPlayer = 'player2';
+          }
+        }
+        endGame(mode === 'cpu' && b === bird2);
+      }
+    }
+
+    function updatePipes() {
+      for (let i = pipes.length - 1; i >= 0; i--) {
+        pipes[i].x -= 2;
+        const hitsPipe = (b) =>
+          b.x < pipes[i].x + pipes[i].width &&
+          b.x + b.width > pipes[i].x &&
+          (b.y < pipes[i].top || b.y + b.height > canvas.height - pipes[i].bottom);
+        
+        if (mode === '2player') {
+          if (hitsPipe(bird)) {
+            losingPlayer = 'player1';
+            endGame(false);
+          }
+          if (hitsPipe(bird2)) {
+            losingPlayer = 'player2';
+            endGame(false);
+          }
+        } else if (mode === 'classic' && hitsPipe(bird)) {
+          endGame(false);
+        } else if (mode === 'cpu' && hitsPipe(bird)) {
+          endGame(false);
+        } else if (mode === 'cpu' && hitsPipe(bird2)) {
+          endGame(true);
+        }
+
+        // Increment score when bird passes the center of the pipe
+        if (!pipes[i].scored) {
+          if (mode === '2player') {
+            if (bird.x > pipes[i].x + pipes[i].width/2 || bird2.x > pipes[i].x + pipes[i].width/2) {
+              pipes[i].scored = true;
+              score++;
+              if (score > highScore) highScore = score;
+            }
+          } else if (mode === 'classic' && bird.x > pipes[i].x + pipes[i].width/2) {
+            pipes[i].scored = true;
+            score++;
+            if (score > highScore) highScore = score;
+          } else if (mode === 'cpu' && bird.x > pipes[i].x + pipes[i].width/2) {
+            pipes[i].scored = true;
+            score++;
+            if (score > highScore) highScore = score;
+          }
+        }
+
+        // Remove pipe when it's off screen
+        if (pipes[i].x + pipes[i].width < 0) {
+          pipes.splice(i, 1);
+        }
+      }
+
+      if (frame % 100 === 0) {
+        const minGap = 160 - Math.min(score * 2, 80);
+        const maxGap = 200 - Math.min(score * 2, 100);
+        const gap = Math.floor(Math.random() * (maxGap - minGap + 1)) + minGap;
+        const top = Math.floor(Math.random() * (canvas.height - gap - 100)) + 50;
+        const bottom = canvas.height - top - gap;
+        pipes.push({ x: canvas.width, width: 50, top, bottom, scored: false });
+      }
+    }
+    // function drawScore() {
+    //   ctx.fillStyle = '#000';
+    //   ctx.font = '20px Arial';
+    //   ctx.fillText('Score: ' + score, 10, 30);
+    //   ctx.fillText('High Score: ' + highScore, 10, 60);
+    // }
+    function drawScore() {
+      if (!gameOver) {
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 48px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(score, canvas.width / 2, 60);
+        ctx.textAlign = 'start'; // reset alignment
+      }
+    }
+
+    function cpuControl() {
+      const nextPipe = pipes.find(pipe => pipe.x + pipe.width > bird2.x);
+      if (!nextPipe) return;
+
+      const gapTop = nextPipe.top;
+      const gapBottom = canvas.height - nextPipe.bottom;
+      const gapCenter = ((gapTop + gapBottom) / 2);
+      const targetY = gapCenter +60; // aim just above center
+
+      // Add tolerance and anticipation
+      if (bird2.y + bird2.height > targetY && bird2.velocity > 1) {
+        bird2.velocity = bird2.lift;
+        flapSound.currentTime = 0;
+        flapSound.play();
+      }
+    }
+
+    function loop() {
+      if (!gameStarted) return;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (!gameOver) {
+        drawBird(bird);
+        updateBird(bird);
+        if (mode === '2player' || mode === 'cpu') {
+          drawBird(bird2);
+          updateBird(bird2);
+        }
+        if (mode === 'cpu') {
+          cpuControl();
+        }
+        updatePipes();
+        pipes.forEach(drawPipe);
+        drawScore();
+        frame++;
+        requestAnimationFrame(loop);
+      } else {
+        showGameOverScreen(playerWon);
+      }
+    }
+
+    function selectMode(selectedMode) {
+      mode = selectedMode;
+      document.getElementById('modeSelectOverlay').classList.add('hidden');
+      initGame();
+      startGame();
+    }
+
+
+    function startGame() {
+      gameStarted = true;
+      gameOver = false;
+      playerWon = false;
+      buttons = [];
+      bgMusic.play();
+      loop();
+    }
+
+
+    function restartGame() {
+      initGame();
+      document.getElementById('gameOverOverlay').classList.add('hidden');
+      buttons = [];
+      loop();
+    }
+
+
+    function endGame(won = false) {
+      gameOver = true;
+      playerWon = won;
+      bgMusic.pause();
+      bgMusic.currentTime = 0;
+      deathSound.play();
+      showGameOverScreen(playerWon);
+    }
+
+    function showModeSelect() {
+      gameStarted = false;
+      gameOver = false;
+      document.getElementById('gameOverOverlay').classList.add('hidden');
+      document.getElementById('modeSelectOverlay').classList.remove('hidden');
+    }
+
+    function showGameOverScreen(playerWins) {
+      const gameOverOverlay = document.getElementById('gameOverOverlay');
+      const singleplayerOverlay = document.getElementById('singleplayerOverlay');
+      const twoplayerOverlay = document.getElementById('twoplayerOverlay');
+      const cpuOverlay = document.getElementById('cpuOverlay');
+      const winnerBird = document.getElementById('winnerBird');
+      
+      // Hide all overlays first
+      singleplayerOverlay.classList.remove('active');
+      twoplayerOverlay.classList.remove('active');
+      cpuOverlay.classList.remove('active');
+
+      // Update score display for all modes
+      document.getElementById('singleplayerScore').textContent = `Score: ${score}`;
+      document.getElementById('twoplayerScore').textContent = `Score: ${score}`;
+      document.getElementById('cpuScore').textContent = `Score: ${score}`;
+
+      if (mode === 'classic') {
+        singleplayerOverlay.classList.add('active');
+        const gameOverMessage = document.getElementById('gameOverMessage');
+
+        gameOverMessage.textContent = 'Game Over';
+        gameOverMessage.style.color = '#c0392b';
+      } else if (mode === '2player') {
+        twoplayerOverlay.classList.add('active');
+        const playerWinMessage = document.getElementById('playerWinMessage');
+        
+        if (losingPlayer === 'player2') {
+          playerWinMessage.textContent = 'Player 1 Wins!';
+          playerWinMessage.style.color = '#f1c40f';
+          winnerBird.style.background = 'yellow';
+          winnerBird.classList.remove('orange');
+        } else {
+          playerWinMessage.textContent = 'Player 2 Wins!';
+          playerWinMessage.style.color = '#e67e22';
+          winnerBird.style.background = 'orange';
+          winnerBird.classList.add('orange');
+        }
+      } else if (mode === 'cpu') {
+        cpuOverlay.classList.add('active');
+        const cpuResultMessage = document.getElementById('cpuResultMessage');
+        
+        if (playerWins) {
+          cpuResultMessage.textContent = 'You Win!';
+          cpuResultMessage.style.color = '#27ae60';
+        } else {
+          cpuResultMessage.textContent = 'You Lose!';
+          cpuResultMessage.style.color = '#c0392b';
+        }
+      }
+
+      updateHighScoreDisplay();
+      gameOverOverlay.classList.remove('hidden');
+    }
+
+    function updateHighScoreDisplay() {
+      document.getElementById('highScoreDisplay').textContent = highScore;
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (gameStarted && !gameOver) {
+        if (e.code === 'Space') {
+          bird.velocity = bird.lift;
+          flapSound.currentTime = 0;
+          flapSound.play();
+        }
+        if (mode === '2player' && e.code === 'ShiftRight') {
+          bird2.velocity = bird2.lift;
+          flapSound.currentTime = 0;
+          flapSound.play();
+        }
+      }
+    });
+    canvas.addEventListener('click', (e) => {
+      if (!gameOver) return;
+
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      buttons.forEach(btn => {
+        if (
+          mouseX >= btn.x &&
+          mouseX <= btn.x + btn.width &&
+          mouseY >= btn.y &&
+          mouseY <= btn.y + btn.height
+        ) {
+          btn.onClick();
+        }
+      });
+    });
+
+  </script>
+</body>
+</html>

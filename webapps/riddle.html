@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Riddle Me This 🧠</title>
+  <style>
+    body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+  }
+
+  h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #2c3e50;
+  }
+
+  .riddle-box {
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 20px;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.1);
+    padding: 2.5rem;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    backdrop-filter: blur(5px);
+    transition: transform 0.4s ease;
+  }
+
+  .riddle-box:hover {
+    transform: scale(1.03);
+  }
+
+  .riddle-question {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  .riddle-answer {
+    font-weight: bold;
+    display: none;
+    margin-top: 1rem;
+    color: #16a085;
+  }
+
+  button {
+    padding: 0.8rem 1.5rem;
+    background: #16a085;
+    color: white;
+    border: none;
+    border-radius: 999px;
+    font-size: 1rem;
+    margin: 0.5rem;
+    cursor: pointer;
+    transition: background 0.3s ease, transform 0.2s ease;
+  }
+
+  button:hover {
+    background: #12876f;
+    transform: translateY(-2px);
+  }
+
+  footer {
+    margin-top: 4rem;
+    font-size: 0.9rem;
+    color: #777;
+  }
+
+  .top-bar {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 100%;
+    padding: 16px 24px;
+    position: absolute;
+    top: 0;
+    z-index: 10;
+  }
+
+  .menu-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s;
+  }
+
+  .menu-button:hover {
+    background: rgba(22, 160, 133, 0.15);
+  }
+
+  .hamburger-lines {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 18px;
+  }
+
+  .line {
+    width: 24px;
+    height: 3px;
+    border-radius: 1px;
+    background-color: #16a085;
+    transition: background-color 0.3s;
+  }
+
+  .game-logo {
+    font-size: 1.75rem;
+    color: #16a085;
+    font-weight: bold;
+    transition: color 0.3s;
+  }
+
+  .dropdown-menu {
+    display: none;
+    position: absolute;
+    top: calc(100% - 10px);
+    left: 24px;
+    background: rgba(22, 160, 133, 0.15);
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 20;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .dropdown-link {
+    display: block;
+    padding: 10px 14px;
+    font-size: 1.2rem;
+    text-decoration: none;
+    font-weight: bold;
+    color: #16a085;
+    cursor: pointer;
+  }
+
+  .dropdown-link:hover {
+    background: #12876f;
+    color: white;
+    border-radius: 6px;
+  }
+
+  .menu-button.menu-open .dropdown-menu {
+    display: block;
+  }
+    .menu-button.menu-open {
+    background: rgba(22, 160, 133, 0.15);
+  }
+
+  .menu-button.menu-open:hover {
+    background: rgba(22, 160, 133, 0.25); /* darker hover when open */
+  }
+
+
+  </style>
+</head>
+<body>
+  <div class="top-bar">
+    <div class="menu-button" id="menu-toggle">
+      <div class="hamburger-lines">
+        <span class="line"></span>
+        <span class="line"></span>
+        <span class="line"></span>
+      </div>
+      <span class="game-logo">Riddle Me This</span>
+      <div class="dropdown-menu" id="dropdown-menu">
+        <a href="../games.html" class="dropdown-link">Game Library</a>
+      </div>
+    </div>
+  </div>
+  
+  <br> <br> <br> <br> <br> <br>
+
+  <div class="riddle-box">
+    <div class="riddle-question" id="riddleQuestion">
+      Click the button for a riddle!
+    </div>
+    <div class="riddle-answer" id="riddleAnswer"></div>
+    <button onclick="generateRiddle()">New Riddle</button>
+    <button onclick="toggleAnswer()">Show/Hide Answer</button>
+  </div>
+
+  <footer>
+    *Riddles are all randomly generated, we are not responsible for any content in the riddles.
+  </footer>
+
+  <script>
+    const riddles = [
+      {
+        question: "What has to be broken before you can use it?",
+        answer: "An egg."
+      },
+      {
+        question: "I speak without a mouth and hear without ears. What am I?",
+        answer: "An echo."
+      },
+      {
+        question: "What can you catch but not throw?",
+        answer: "A cold."
+      },
+      {
+        question: "The more you take, the more you leave behind. What are they?",
+        answer: "Footsteps."
+      },
+      {
+        question: "What gets wetter the more it dries?",
+        answer: "A towel."
+      }
+    ];
+
+    async function generateRiddle() {
+      const riddleQ = document.getElementById("riddleQuestion");
+      const riddleA = document.getElementById("riddleAnswer");
+
+      riddleQ.textContent = "Loading a new riddle...";
+      riddleA.textContent = "";
+      riddleA.style.display = "none";
+
+      try {
+        const res = await fetch("https://riddles-api.vercel.app/random");
+        const data = await res.json();
+        riddleQ.textContent = data.riddle;
+        riddleA.textContent = data.answer;
+      } catch (err) {
+        riddleQ.textContent = "Failed to load riddle.";
+        riddleA.textContent = "Please try again later.";
+      }
+}
+
+
+    function toggleAnswer() {
+      const answerDiv = document.getElementById("riddleAnswer");
+      answerDiv.style.display = answerDiv.style.display === "none" ? "block" : "none";
+    }
+    
+  const menuToggle = document.getElementById('menu-toggle');
+
+    menuToggle.addEventListener('click', () => {
+      menuToggle.classList.toggle('menu-open');
+    });
+  </script>
+
+</body>
+</html>
